@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🔍 找不同遊戲 - 小朋友一起來玩！</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CSS Reset & Base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --coral: #FF6B6B;
+  --coral-dark: #E55A5A;
+  --teal: #4ECDC4;
+  --yellow: #FFE66D;
+  --yellow-dark: #FFD93D;
+  --orange: #FF8C42;
+  --green: #51CF66;
+  --bg: #FFF8E7;
+  --card: #FFFFFF;
+  --brown: #5D4037;
+  --brown-light: #8D6E63;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+}
+
+body {
+  font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  color: var(--brown);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,107,107,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(78,205,196,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(255,230,109,0.08) 0%, transparent 50%);
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+h1 { font-size: 2.2rem; font-weight: 900; letter-spacing: 0.02em; }
+h2 { font-size: 1.6rem; font-weight: 800; }
+h3 { font-size: 1.3rem; font-weight: 700; }
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 28px; border: none; border-radius: 50px;
+  font-family: inherit; font-size: 1.05rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.btn:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+.btn-primary { background: var(--coral); color: #fff; }
+.btn-primary:hover { background: var(--coral-dark); }
+.btn-teal { background: var(--teal); color: #fff; }
+.btn-teal:hover { background: #3cbdb5; }
+.btn-yellow { background: var(--yellow); color: var(--brown); }
+.btn-yellow:hover { background: var(--yellow-dark); }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover { background: #e67a30; }
+.btn-outline {
+  background: transparent; color: var(--brown);
+  border: 3px solid var(--brown-light); box-shadow: none;
+}
+.btn-outline:hover { background: rgba(0,0,0,0.03); }
+.btn-sm { padding: 8px 18px; font-size: 0.9rem; }
+.btn-lg { padding: 18px 36px; font-size: 1.2rem; }
+.btn-icon { width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 1.3rem; }
+
+/* ============================================================
+   Layout
+   ============================================================ */
+#app { max-width: 1200px; margin: 0 auto; padding: 16px; min-height: 100vh; }
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounceIn {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.15); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+@keyframes popIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes wiggle {
+  0%,100% { transform: rotate(0); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+@keyframes sparkle {
+  0%,100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.5; transform: scale(1.3) rotate(180deg); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.app-header {
+  text-align: center; padding: 20px 0 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.app-title {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--coral); font-size: 2rem; font-weight: 900;
+}
+.app-title .icon { font-size: 2.4rem; animation: float 3s ease-in-out infinite; }
+
+/* ============================================================
+   Game Cards (Home Page)
+   ============================================================ */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px; padding: 20px 0;
+}
+.game-card {
+  background: var(--card); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow);
+  transition: all 0.25s ease; cursor: pointer;
+  border: 3px solid transparent;
+}
+.game-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--yellow); }
+.game-card .card-img {
+  width: 100%; height: 180px; object-fit: cover;
+  background: #f0f0f0;
+}
+.game-card .card-body { padding: 16px; }
+.game-card .card-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; }
+.game-card .card-meta { font-size: 0.85rem; color: var(--brown-light); }
+.game-card .card-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+
+.empty-state {
+  text-align: center; padding: 60px 20px; grid-column: 1 / -1;
+}
+.empty-state .empty-icon { font-size: 5rem; display: block; animation: float 3s ease-in-out infinite; }
+.empty-state h2 { margin: 16px 0 8px; color: var(--brown-light); }
+.empty-state p { color: var(--brown-light); margin-bottom: 24px; }
+
+/* ============================================================
+   Teacher Dashboard
+   ============================================================ */
+.dashboard-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+}
+.dashboard-header h2 { display: flex; align-items: center; gap: 8px; }
+
+/* ============================================================
+   Editor Page
+   ============================================================ */
+.editor-layout { display: flex; flex-direction: column; gap: 16px; }
+
+.editor-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  padding: 16px 20px; background: var(--card);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.editor-toolbar .tool-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.editor-main {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .editor-main { grid-template-columns: 1fr; }
+}
+
+.editor-panel {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.editor-panel h3 { display: flex; align-items: center; gap: 8px; font-size: 1rem; }
+
+.image-upload-area {
+  position: relative;
+  border: 3px dashed #ddd; border-radius: var(--radius-sm);
+  min-height: 200px; display: flex; align-items: center;
+  justify-content: center; cursor: pointer;
+  transition: all 0.2s ease; overflow: hidden;
+  background: #fafafa;
+}
+.image-upload-area:hover { border-color: var(--teal); background: #f0fdfd; }
+.image-upload-area.has-image { border-style: solid; border-color: var(--teal); }
+.image-upload-area img {
+  width: 100%; height: auto; display: block;
+}
+.image-upload-area .upload-hint {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  text-align: center; color: var(--brown-light); pointer-events: none;
+}
+.image-upload-area .upload-hint .hint-icon { font-size: 3rem; display: block; margin-bottom: 8px; }
+.image-upload-area.has-image .upload-hint { display: none; }
+
+/* Circle overlay for editor */
+.editor-image-wrapper {
+  position: relative; display: inline-block;
+  width: 100%; line-height: 0;
+}
+.editor-image-wrapper img { width: 100%; height: auto; display: block; }
+.circles-overlay {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+.editor-circle {
+  position: absolute;
+  border: 3px solid #FF6B6B;
+  border-radius: 50%;
+  background: rgba(255,107,107,0.15);
+  pointer-events: auto;
+  cursor: move;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.editor-circle:hover { box-shadow: 0 0 0 4px rgba(255,107,107,0.2); }
+.editor-circle.selected {
+  border-color: #FFD700;
+  box-shadow: 0 0 0 6px rgba(255,215,0,0.3);
+  z-index: 10;
+}
+.editor-circle .circle-label {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 900; font-size: 0.85rem;
+  color: var(--coral); pointer-events: none;
+  text-shadow: 0 0 4px rgba(255,255,255,0.8);
+}
+
+/* Resize handles */
+.resize-handle {
+  position: absolute;
+  width: 16px; height: 16px;
+  background: #fff; border: 3px solid var(--coral);
+  border-radius: 50%; pointer-events: auto;
+  z-index: 5; transition: transform 0.1s ease;
+}
+.resize-handle:hover { transform: scale(1.3); }
+.resize-handle.n { top: -8px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+.resize-handle.n:hover { transform: translateX(-50%) scale(1.3); }
+.resize-handle.s { bottom: -8px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+.resize-handle.s:hover { transform: translateX(-50%) scale(1.3); }
+.resize-handle.e { right: -8px; top: 50%; transform: translateY(-50%); cursor: e-resize; }
+.resize-handle.e:hover { transform: translateY(-50%) scale(1.3); }
+.resize-handle.w { left: -8px; top: 50%; transform: translateY(-50%); cursor: w-resize; }
+.resize-handle.w:hover { transform: translateY(-50%) scale(1.3); }
+
+.circle-delete-btn {
+  position: absolute; top: -12px; right: -12px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--coral);
+  color: var(--coral); font-size: 0.9rem; font-weight: 900;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  z-index: 11; transition: all 0.15s ease;
+  line-height: 1; pointer-events: auto;
+}
+.circle-delete-btn:hover { background: var(--coral); color: #fff; transform: scale(1.1); }
+
+.editor-instructions {
+  text-align: center; padding: 8px;
+  background: #FFF3E0; border-radius: var(--radius-xs);
+  font-size: 0.9rem; color: var(--orange);
+}
+
+/* ============================================================
+   Play Mode
+   ============================================================ */
+.play-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+  padding: 16px 20px; background: var(--card);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.play-score {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 1.3rem; font-weight: 800;
+}
+.play-score .found-count { color: var(--green); font-size: 2rem; }
+.play-score .total-count { color: var(--brown-light); }
+
+.play-images {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .play-images { grid-template-columns: 1fr; }
+}
+
+.play-image-container {
+  position: relative; display: inline-block;
+  width: 100%; line-height: 0;
+  border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow); cursor: crosshair;
+  border: 4px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.play-image-container:hover { border-color: var(--yellow); }
+.play-image-container img { width: 100%; height: auto; display: block; }
+.play-image-container .play-label {
+  position: absolute; top: 10px; left: 10px;
+  background: rgba(0,0,0,0.5); color: #fff;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 0.85rem; font-weight: 700; pointer-events: none;
+}
+
+/* Found circle in play mode */
+.play-circle {
+  position: absolute;
+  border: 4px solid #FF0000;
+  border-radius: 50%;
+  background: rgba(255,0,0,0.15);
+  pointer-events: none;
+  animation: popIn 0.4s ease forwards;
+  z-index: 5;
+}
+
+/* Sparkle effect */
+.sparkle {
+  position: absolute; pointer-events: none; z-index: 10;
+  font-size: 2rem; animation: sparkle 0.6s ease forwards;
+}
+
+/* Click ripple */
+.click-ripple {
+  position: absolute; pointer-events: none; z-index: 4;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 3px solid rgba(100,100,100,0.4);
+  transform: translate(-50%, -50%);
+  animation: rippleOut 0.5s ease forwards;
+}
+@keyframes rippleOut {
+  0% { width: 10px; height: 10px; opacity: 0.8; }
+  100% { width: 80px; height: 80px; opacity: 0; }
+}
+
+/* Celebration overlay */
+.celebration {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 1000;
+}
+.celebration-emoji {
+  position: absolute; font-size: 3rem;
+  animation: confettiFall 2s ease-in forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ============================================================
+   Modal
+   ============================================================ */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.hidden { display: none; }
+
+.modal-box {
+  background: var(--card); border-radius: var(--radius);
+  padding: 32px; box-shadow: var(--shadow-lg);
+  max-width: 420px; width: 90%; text-align: center;
+  animation: bounceIn 0.4s ease;
+}
+.modal-box h2 { margin-bottom: 8px; }
+.modal-box p { color: var(--brown-light); margin-bottom: 20px; }
+.modal-box .emoji-lock { font-size: 4rem; display: block; margin-bottom: 8px; }
+
+.input-group {
+  display: flex; gap: 10px; margin-bottom: 12px;
+}
+.input-group input {
+  flex: 1; padding: 14px 20px; border: 3px solid #e0e0e0;
+  border-radius: 50px; font-family: inherit; font-size: 1.1rem;
+  text-align: center; letter-spacing: 0.3em;
+  transition: border-color 0.2s ease;
+}
+.input-group input:focus { outline: none; border-color: var(--teal); }
+.input-group input.error { border-color: var(--coral); animation: wiggle 0.4s ease; }
+
+.modal-error { color: var(--coral); font-size: 0.9rem; margin-top: 6px; min-height: 20px; }
+
+/* ============================================================
+   Setup banner
+   ============================================================ */
+.setup-banner {
+  background: #FFF3CD; border: 2px solid #FFC107; border-radius: var(--radius);
+  padding: 16px 20px; margin-bottom: 20px; text-align: center;
+}
+.setup-banner h3 { color: #856404; margin-bottom: 6px; }
+.setup-banner p { color: #856404; font-size: 0.9rem; }
+
+/* ============================================================
+   Toast
+   ============================================================ */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: var(--brown); color: #fff; padding: 12px 28px;
+  border-radius: 50px; font-weight: 700; z-index: 200;
+  animation: fadeIn 0.3s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   Utility
+   ============================================================ */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.gap-8 { gap: 8px; }
+.flex-wrap { display: flex; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="app-header">
+    <div class="app-title">
+      <span class="icon">🔍</span>
+      <span>找不同遊戲</span>
+    </div>
+    <div class="flex-wrap gap-8">
+      <button class="btn btn-outline btn-sm" onclick="navigateTo('home')" id="btnHome">🏠 首頁</button>
+      <button class="btn btn-yellow btn-sm" onclick="showPasswordModal()" id="btnTeacher">👩‍🏫 老師模式</button>
+    </div>
+  </header>
+
+  <!-- Supabase 未設定提示 -->
+  <div class="setup-banner hidden" id="setupBanner">
+    <h3>⚙️ 需要設定 Supabase 連線</h3>
+    <p>請在程式碼頂部填入您的 Supabase URL 和 API 金鑰（免費註冊：<a href="https://supabase.com" target="_blank">supabase.com</a>）</p>
+  </div>
+
+  <!-- ============================================================
+       HOME PAGE
+       ============================================================ -->
+  <div class="page active" id="homePage">
+    <div class="games-grid" id="gamesGrid"></div>
+  </div>
+
+  <!-- ============================================================
+       TEACHER DASHBOARD PAGE
+       ============================================================ -->
+  <div class="page" id="teacherPage">
+    <div class="dashboard-header">
+      <h2>👩‍🏫 老師管理後台</h2>
+      <div class="flex-wrap gap-8">
+        <button class="btn btn-teal" onclick="createNewGame()">➕ 新增遊戲</button>
+        <button class="btn btn-outline btn-sm" onclick="teacherLogout()">🔒 離開</button>
+      </div>
+    </div>
+    <div class="games-grid" id="teacherGamesGrid"></div>
+  </div>
+
+  <!-- ============================================================
+       EDITOR PAGE
+       ============================================================ -->
+  <div class="page" id="editorPage">
+    <div class="editor-layout">
+      <div class="editor-toolbar">
+        <div class="tool-group">
+          <button class="btn btn-outline btn-sm" onclick="navigateTo('teacher')">⬅ 返回</button>
+          <h3>✏️ 標記不同處</h3>
+        </div>
+        <div class="tool-group">
+          <span style="font-size:0.9rem;color:var(--brown-light);" id="circleCount">圓圈：0 個</span>
+          <button class="btn btn-orange btn-sm" onclick="saveGame()">💾 儲存遊戲</button>
+        </div>
+      </div>
+
+      <div class="editor-panel">
+        <label style="font-weight:700;">📝 遊戲名稱：</label>
+        <input type="text" id="gameTitleInput" placeholder="例如：海底世界找不同" style="padding:12px 16px;border:3px solid #e0e0e0;border-radius:50px;font-size:1rem;font-family:inherit;max-width:400px;">
+      </div>
+
+      <div class="editor-main">
+        <div class="editor-panel" id="editorPanel1">
+          <h3>📷 圖片 1（在此圖片上標記不同處）</h3>
+          <div class="image-upload-area" id="uploadArea1" onclick="if(!this.classList.contains('has-image'))document.getElementById('fileInput1').click()">
+            <div class="upload-hint"><span class="hint-icon">📁</span><span>點擊上傳圖片 1</span></div>
+            <div class="editor-image-wrapper hidden" id="imageWrapper1">
+              <img id="editorImage1" src="" alt="圖片 1" draggable="false">
+              <div class="circles-overlay" id="circlesOverlay1"></div>
+            </div>
+            <input type="file" id="fileInput1" accept="image/*" style="display:none;" onchange="handleImageUpload(1, this)">
+          </div>
+          <div class="editor-instructions">
+            💡 在此圖片上<strong>點擊</strong>新增圓圈｜<strong>拖曳圓圈</strong>移動位置｜<strong>拖曳邊緣把手</strong>改變形狀大小｜點擊 <strong>✕</strong> 刪除
+          </div>
+        </div>
+
+        <div class="editor-panel">
+          <h3>📷 圖片 2</h3>
+          <div class="image-upload-area" id="uploadArea2" onclick="if(!this.classList.contains('has-image'))document.getElementById('fileInput2').click()">
+            <div class="upload-hint"><span class="hint-icon">📁</span><span>點擊上傳圖片 2</span></div>
+            <img id="editorImage2" src="" alt="圖片 2" style="width:100%;height:auto;display:none;" draggable="false">
+            <input type="file" id="fileInput2" accept="image/*" style="display:none;" onchange="handleImageUpload(2, this)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PLAY PAGE
+       ============================================================ -->
+  <div class="page" id="playPage">
+    <div class="play-header">
+      <button class="btn btn-outline btn-sm" onclick="navigateTo('home')">⬅ 返回首頁</button>
+      <h3 id="playTitle">🔍 找不同</h3>
+      <div class="play-score">
+        <span>🎯 找到：</span>
+        <span class="found-count" id="foundCount">0</span>
+        <span> / </span>
+        <span class="total-count" id="totalCount">0</span>
+      </div>
+    </div>
+    <div class="play-images" id="playImages"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PASSWORD MODAL
+     ============================================================ -->
+<div class="modal-overlay hidden" id="passwordModal">
+  <div class="modal-box">
+    <span class="emoji-lock">🔐</span>
+    <h2>老師驗證</h2>
+    <p>請輸入密碼以進入管理模式</p>
+    <div class="input-group">
+      <input type="password" id="passwordInput" placeholder="請輸入密碼" maxlength="10" onkeydown="if(event.key==='Enter')verifyPassword()">
+      <button class="btn btn-primary" onclick="verifyPassword()">確認</button>
+    </div>
+    <div class="modal-error" id="passwordError"></div>
+    <button class="btn btn-outline btn-sm mt-16" onclick="hidePasswordModal()">取消</button>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+<div class="celebration" id="celebrationOverlay"></div>
+
+<script>
+// ============================================================
+// SECTION 1: CONFIGURATION
+// ============================================================
+const SUPABASE_URL = 'https://mpladkxxkfnhmgojjfhh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wbGFka3h4a2ZuaG1nb2pqZmhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNDIyODMsImV4cCI6MjA5NzkxODI4M30.YkAU9QefRG7k-CsXNT8QrZhGJstHyG5vMNRJ4UqjFaw';
+const TEACHER_PASSWORD = '9527';
+const BUCKET_NAME = 'game-images';
+
+const API_HEADERS = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+  'Content-Type': 'application/json',
+};
+
+function isConfigured() {
+  return SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_URL.includes('xxxxxxxxxxxx');
+}
+
+// ============================================================
+// SECTION 2: GLOBAL STATE
+// ============================================================
+let currentPage = 'home';
+let isTeacherMode = false;
+let games = [];
+let currentGameId = null;
+let editorImages = { 1: null, 2: null };
+let editorImageElements = { 1: null, 2: null };
+let editorCircles = [];
+let selectedCircleIndex = -1;
+let isDragging = false;
+let dragType = null;
+let dragStartPos = null;
+let dragStartCircle = null;
+let justFinishedDragging = false;
+let playFoundIndices = new Set();
+let playTotalDifferences = 0;
+
+// ============================================================
+// SECTION 3: INITIALIZATION
+// ============================================================
+async function init() {
+  if (!isConfigured()) {
+    document.getElementById('setupBanner').classList.remove('hidden');
+    console.warn('⚠️ Supabase 尚未設定');
+  } else {
+    console.log('✅ Supabase 已設定');
+  }
+  await loadGames();
+  renderHome();
+}
+
+// ============================================================
+// SECTION 4: NAVIGATION
+// ============================================================
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById({home:'homePage',teacher:'teacherPage',editor:'editorPage',play:'playPage'}[page]||'homePage').classList.add('active');
+  currentPage = page;
+  if (page === 'teacher') renderTeacherDashboard();
+  if (page === 'home') renderHome();
+}
+
+// ============================================================
+// SECTION 5: PASSWORD MODAL
+// ============================================================
+function showPasswordModal() {
+  document.getElementById('passwordModal').classList.remove('hidden');
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('passwordError').textContent = '';
+  document.getElementById('passwordInput').classList.remove('error');
+  setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+}
+function hidePasswordModal() { document.getElementById('passwordModal').classList.add('hidden'); }
+function verifyPassword() {
+  const input = document.getElementById('passwordInput');
+  const error = document.getElementById('passwordError');
+  if (input.value === TEACHER_PASSWORD) {
+    isTeacherMode = true; hidePasswordModal(); navigateTo('teacher');
+    showToast('✅ 驗證成功！歡迎老師～');
+  } else {
+    error.textContent = '❌ 密碼錯誤，請再試一次';
+    input.classList.add('error'); input.value = '';
+    setTimeout(() => input.classList.remove('error'), 500); input.focus();
+  }
+}
+function teacherLogout() { isTeacherMode = false; navigateTo('home'); showToast('🔒 已離開老師模式'); }
+
+// ============================================================
+// SECTION 6: TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s ease'; setTimeout(() => t.remove(), 300); }, 2000);
+}
+
+// ============================================================
+// SECTION 7: SUPABASE REST API OPERATIONS
+// ============================================================
+async function apiCall(path, options = {}) {
+  const { headers: optHeaders, ...restOpts } = options;
+  const url = SUPABASE_URL + '/rest/v1' + path;
+  const res = await fetch(url, {
+    ...restOpts,
+    headers: { ...API_HEADERS, ...(optHeaders || {}) },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    console.error('API Error:', url, res.status, text);
+    throw new Error(text || res.statusText);
+  }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+async function loadGames() {
+  if (!isConfigured()) { games = []; return; }
+  try {
+    games = await apiCall('/games?select=*&order=created_at.desc') || [];
+  } catch(e) {
+    console.error('載入遊戲失敗:', e);
+    games = [];
+  }
+}
+
+async function uploadImageToStorage(file) {
+  const fileName = Date.now() + '_' + Math.random().toString(36).slice(2,8) + '_' + file.name;
+  const url = SUPABASE_URL + '/storage/v1/object/' + BUCKET_NAME + '/' + fileName;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': file.type || 'image/png',
+      'x-upsert': 'true',
+    },
+    body: file,
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('Upload error:', url, res.status, err);
+    throw new Error('圖片上傳失敗: ' + err);
+  }
+  return SUPABASE_URL + '/storage/v1/object/public/' + BUCKET_NAME + '/' + fileName;
+}
+
+async function insertGame(gameData) {
+  const data = await apiCall('/games', {
+    method: 'POST',
+    body: JSON.stringify(gameData),
+    headers: { 'Prefer': 'return=representation' },
+  });
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function updateGameRecord(id, updates) {
+  await apiCall('/games?id=eq.' + id, {
+    method: 'PATCH',
+    body: JSON.stringify(updates),
+  });
+}
+
+async function deleteGameRecord(id) {
+  const game = games.find(g => g.id === id) || (await apiCall('/games?id=eq.' + id + '&select=*'));
+  const g = Array.isArray(game) ? game[0] : game;
+  if (g) {
+    for (const url of [g.image1_url, g.image2_url]) {
+      if (!url) continue;
+      const m = url.match(/\/public\/game-images\/(.+)$/);
+      if (m) {
+        const delUrl = SUPABASE_URL + '/storage/v1/object/' + BUCKET_NAME + '/' + m[1];
+        await fetch(delUrl, {
+          method: 'DELETE',
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+        }).catch(() => {});
+      }
+    }
+  }
+  await apiCall('/games?id=eq.' + id, { method: 'DELETE' });
+}
+
+// ============================================================
+// SECTION 8: RENDER HOME PAGE
+// ============================================================
+function renderHome() {
+  const grid = document.getElementById('gamesGrid');
+  if (!games.length) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎨</span><h2>還沒有遊戲喔～</h2><p>請老師先新增找不同遊戲吧！</p><button class="btn btn-yellow btn-lg" onclick="showPasswordModal()">👩‍🏫 老師新增遊戲</button></div>';
+    return;
+  }
+  grid.innerHTML = games.map(g => {
+    const n = Array.isArray(g.differences) ? g.differences.length : 0;
+    return '<div class="game-card" onclick="startPlay(\''+g.id+'\')"><img class="card-img" src="'+escapeHtml(g.image1_url)+'" alt="'+escapeHtml(g.title)+'" loading="lazy" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23f0f0f0%22 width=%22260%22 height=%22180%22/><text x=%22130%22 y=%2295%22 text-anchor=%22middle%22 fill=%22%23ccc%22 font-size=%2230%22>🖼</text></svg>\'"><div class="card-body"><div class="card-title">'+escapeHtml(g.title)+'</div><div class="card-meta">🔴 '+n+' 個不同處</div></div></div>';
+  }).join('');
+}
+
+// ============================================================
+// SECTION 9: TEACHER DASHBOARD & CRUD
+// ============================================================
+async function renderTeacherDashboard() {
+  if (!isTeacherMode) { navigateTo('home'); return; }
+  await loadGames();
+  const grid = document.getElementById('teacherGamesGrid');
+  if (!games.length) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">📝</span><h2>還沒有任何遊戲</h2><p>點擊下方按鈕來建立第一個找不同遊戲！</p><button class="btn btn-teal btn-lg" onclick="createNewGame()">➕ 新增遊戲</button></div>';
+    return;
+  }
+  grid.innerHTML = games.map(g => {
+    const n = Array.isArray(g.differences) ? g.differences.length : 0;
+    return '<div class="game-card"><img class="card-img" src="'+escapeHtml(g.image1_url)+'" alt="'+escapeHtml(g.title)+'" loading="lazy" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23f0f0f0%22 width=%22260%22 height=%22180%22/><text x=%22130%22 y=%2295%22 text-anchor=%22middle%22 fill=%22%23ccc%22 font-size=%2230%22>🖼</text></svg>\'"><div class="card-body"><div class="card-title">'+escapeHtml(g.title)+'</div><div class="card-meta">🔴 '+n+' 個不同處</div></div><div class="card-actions"><button class="btn btn-teal btn-sm" onclick="event.stopPropagation();editGame(\''+g.id+'\')">✏️ 編輯標記</button><button class="btn btn-outline btn-sm" style="color:var(--coral);border-color:var(--coral);" onclick="event.stopPropagation();confirmDelete(\''+g.id+'\')">🗑 刪除</button></div></div>';
+  }).join('');
+}
+
+function createNewGame() {
+  if (!isTeacherMode) { showPasswordModal(); return; }
+  currentGameId = null; editorImages = {1:null,2:null}; editorCircles = []; selectedCircleIndex = -1;
+  document.getElementById('gameTitleInput').value = '';
+  resetImageUpload(1); resetImageUpload(2); navigateTo('editor');
+}
+
+async function editGame(gameId) {
+  if (!isTeacherMode) { showPasswordModal(); return; }
+  const game = games.find(g => g.id === gameId);
+  if (!game) { showToast('❌ 找不到遊戲'); return; }
+  currentGameId = gameId; editorImages = {1:null,2:null};
+  editorCircles = Array.isArray(game.differences) ? [...game.differences] : []; selectedCircleIndex = -1;
+  document.getElementById('gameTitleInput').value = game.title || '';
+  await loadEditorImage(1, game.image1_url); await loadEditorImage(2, game.image2_url);
+  navigateTo('editor'); setTimeout(() => renderEditorCircles(), 500);
+}
+
+async function confirmDelete(gameId) {
+  if (!confirm('確定要刪除這個遊戲嗎？此操作無法復原！')) return;
+  if (!isConfigured()) { showToast('❌ 需要先設定 Supabase 連線'); return; }
+  try { await deleteGameRecord(gameId); showToast('🗑 遊戲已刪除'); await loadGames(); renderTeacherDashboard(); }
+  catch(e) { console.error(e); showToast('❌ 刪除失敗：' + e.message); }
+}
+
+// ============================================================
+// SECTION 10: IMAGE HANDLING
+// ============================================================
+function handleImageUpload(imageNum, fileInput) {
+  const file = fileInput.files[0]; if (!file) return;
+  editorImages[imageNum] = file;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (imageNum === 1) {
+      document.getElementById('editorImage1').src = e.target.result;
+      document.getElementById('imageWrapper1').classList.remove('hidden');
+      document.getElementById('uploadArea1').classList.add('has-image');
+      editorImageElements[1] = document.getElementById('editorImage1');
+      if (!currentGameId) { editorCircles = []; selectedCircleIndex = -1; }
+      document.getElementById('editorImage1').onload = () => renderEditorCircles();
+    } else {
+      const img = document.getElementById('editorImage2');
+      img.src = e.target.result; img.style.display = 'block';
+      document.getElementById('uploadArea2').classList.add('has-image');
+      editorImageElements[2] = img;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function loadEditorImage(imageNum, url) {
+  return new Promise(resolve => {
+    if (imageNum === 1) {
+      const img = document.getElementById('editorImage1');
+      img.src = url; document.getElementById('imageWrapper1').classList.remove('hidden');
+      document.getElementById('uploadArea1').classList.add('has-image');
+      editorImageElements[1] = img;
+      img.onload = () => { renderEditorCircles(); resolve(); };
+      img.onerror = () => resolve();
+    } else {
+      const img = document.getElementById('editorImage2');
+      img.src = url; img.style.display = 'block';
+      document.getElementById('uploadArea2').classList.add('has-image');
+      editorImageElements[2] = img;
+      img.onload = () => resolve(); img.onerror = () => resolve();
+    }
+  });
+}
+
+function resetImageUpload(n) {
+  if (n === 1) {
+    document.getElementById('imageWrapper1').classList.add('hidden');
+    document.getElementById('editorImage1').src = '';
+    document.getElementById('uploadArea1').classList.remove('has-image');
+    document.getElementById('circlesOverlay1').innerHTML = '';
+  } else {
+    document.getElementById('editorImage2').src = '';
+    document.getElementById('editorImage2').style.display = 'none';
+    document.getElementById('uploadArea2').classList.remove('has-image');
+  }
+  document.getElementById('fileInput'+n).value = ''; editorImageElements[n] = null;
+}
+
+// ============================================================
+// SECTION 11: EDITOR — CIRCLE MANIPULATION
+// ============================================================
+function getImageDisplayRect(imgEl) {
+  if (!imgEl || !imgEl.naturalWidth) return {left:0,top:0,width:0,height:0};
+  const r = imgEl.getBoundingClientRect();
+  return {left:r.left,top:r.top,width:r.width,height:r.height};
+}
+function pixelToFraction(px, py, rect) {
+  return {x:Math.max(0,Math.min(1,px/rect.width)),y:Math.max(0,Math.min(1,py/rect.height))};
+}
+
+function renderEditorCircles() {
+  const overlay = document.getElementById('circlesOverlay1');
+  const img = editorImageElements[1];
+  if (!img || !img.naturalWidth) { overlay.innerHTML = ''; return; }
+  const rect = getImageDisplayRect(img);
+  overlay.innerHTML = '';
+  editorCircles.forEach((c, i) => {
+    const px = c.x*rect.width, py = c.y*rect.height, prx = c.rx*rect.width, pry = c.ry*rect.height;
+    const d = document.createElement('div');
+    d.className = 'editor-circle' + (i===selectedCircleIndex?' selected':'');
+    d.style.cssText = 'left:'+(px-prx)+'px;top:'+(py-pry)+'px;width:'+(prx*2)+'px;height:'+(pry*2)+'px;';
+    d.dataset.index = i;
+
+    const lbl = document.createElement('span'); lbl.className = 'circle-label'; lbl.textContent = i+1; d.appendChild(lbl);
+
+    const xBtn = document.createElement('button'); xBtn.className = 'circle-delete-btn'; xBtn.textContent = '✕';
+    xBtn.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); deleteCircle(i); });
+    xBtn.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); deleteCircle(i); });
+    d.appendChild(xBtn);
+
+    ['n','s','e','w'].forEach(h => {
+      const hd = document.createElement('div'); hd.className = 'resize-handle '+h;
+      hd.addEventListener('mousedown', e => startDrag(e,i,'resize-'+h));
+      hd.addEventListener('touchstart', e => startDrag(e,i,'resize-'+h), {passive:false});
+      d.appendChild(hd);
+    });
+
+    d.addEventListener('mousedown', e => { if(e.target===d) startDrag(e,i,'move'); });
+    d.addEventListener('touchstart', e => { if(e.target===d) startDrag(e,i,'move'); }, {passive:false});
+    overlay.appendChild(d);
+  });
+  document.getElementById('circleCount').textContent = '圓圈：' + editorCircles.length + ' 個';
+}
+
+function startDrag(e, index, type) {
+  e.preventDefault(); e.stopPropagation();
+  selectedCircleIndex = index; isDragging = true; dragType = type;
+  dragStartCircle = {...editorCircles[index]}; dragStartPos = getEventPos(e);
+  renderEditorCircles();
+}
+function getEventPos(e) {
+  if (e.touches?.length) return {x:e.touches[0].clientX,y:e.touches[0].clientY};
+  if (e.changedTouches?.length) return {x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY};
+  return {x:e.clientX,y:e.clientY};
+}
+function addCircle(fx, fy) { editorCircles.push({x:fx,y:fy,rx:0.04,ry:0.04}); selectedCircleIndex=editorCircles.length-1; renderEditorCircles(); }
+function deleteCircle(i) { editorCircles.splice(i,1); if(selectedCircleIndex>=editorCircles.length) selectedCircleIndex=editorCircles.length-1; renderEditorCircles(); }
+
+document.addEventListener('mousemove', e => { if(isDragging) handleDragMove(getEventPos(e)); });
+document.addEventListener('touchmove', e => { if(isDragging){e.preventDefault();handleDragMove(getEventPos(e));} }, {passive:false});
+document.addEventListener('mouseup', e => { if(isDragging) handleDragEnd(); });
+document.addEventListener('touchend', e => { if(isDragging) handleDragEnd(); });
+
+function handleDragMove(pos) {
+  if (!dragStartPos || !dragStartCircle || selectedCircleIndex<0) return;
+  const img = editorImageElements[1]; if (!img) return;
+  const rect = getImageDisplayRect(img); if (!rect.width) return;
+  const dx = (pos.x-dragStartPos.x)/rect.width, dy = (pos.y-dragStartPos.y)/rect.height;
+  const c = editorCircles[selectedCircleIndex];
+  const D = dragStartCircle;
+  if (dragType==='move') { c.x=Math.max(0,Math.min(1,D.x+dx)); c.y=Math.max(0,Math.min(1,D.y+dy)); }
+  else if (dragType==='resize-n') { const r=D.ry-dy; if(r>0.008){c.ry=r; c.y=D.y+dy/2;} }
+  else if (dragType==='resize-s') { const r=D.ry+dy; if(r>0.008){c.ry=r; c.y=D.y-dy/2;} }
+  else if (dragType==='resize-e') { const r=D.rx+dx; if(r>0.008){c.rx=r; c.x=D.x-dx/2;} }
+  else if (dragType==='resize-w') { const r=D.rx-dx; if(r>0.008){c.rx=r; c.x=D.x+dx/2;} }
+  c.x=Math.max(0,Math.min(1,c.x)); c.y=Math.max(0,Math.min(1,c.y));
+  c.rx=Math.max(0.008,Math.min(0.5,c.rx)); c.ry=Math.max(0.008,Math.min(0.5,c.ry));
+  renderEditorCircles();
+}
+function handleDragEnd() {
+  isDragging=false; dragType=null; dragStartPos=null; dragStartCircle=null;
+  justFinishedDragging=true; setTimeout(()=>{justFinishedDragging=false;},150);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const wrapper = document.getElementById('imageWrapper1');
+  if (wrapper) {
+    wrapper.addEventListener('click', e => {
+      if (isDragging||justFinishedDragging) return;
+      if (e.target.closest('.editor-circle')||e.target.closest('.circle-delete-btn')||e.target.closest('.resize-handle')) return;
+      const rect = getImageDisplayRect(editorImageElements[1]);
+      if (!rect.width) return;
+      const f = pixelToFraction(e.clientX-rect.left, e.clientY-rect.top, rect);
+      addCircle(f.x, f.y);
+    });
+  }
+  document.addEventListener('keydown', e => {
+    if (currentPage!=='editor') return;
+    if ((e.key==='Delete'||e.key==='Backspace')&&selectedCircleIndex>=0) { e.preventDefault(); deleteCircle(selectedCircleIndex); }
+  });
+  window.addEventListener('resize', () => {
+    if (currentPage==='editor') renderEditorCircles();
+    if (currentPage==='play') renderPlayCircles();
+  });
+});
+
+// ============================================================
+// SECTION 12: SAVE GAME
+// ============================================================
+async function saveGame() {
+  if (!isTeacherMode) { showToast('❌ 請先驗證老師身份'); return; }
+  if (!isConfigured()) { showToast('❌ 請先設定 Supabase 連線'); return; }
+  const title = document.getElementById('gameTitleInput').value.trim();
+  if (!title) { showToast('❌ 請輸入遊戲名稱'); return; }
+  if (editorCircles.length===0) { showToast('❌ 請至少標記一個不同處'); return; }
+  const img1=editorImageElements[1], img2=editorImageElements[2];
+  if (!img1||!img1.src) { showToast('❌ 請上傳圖片 1'); return; }
+  if (!img2||!img2.src) { showToast('❌ 請上傳圖片 2'); return; }
+
+  try {
+    showToast('⏳ 正在儲存，請稍候...');
+    let u1, u2;
+    if (currentGameId) {
+      const eg = games.find(g=>g.id===currentGameId);
+      u1 = editorImages[1] ? await uploadImageToStorage(editorImages[1]) : (eg?.image1_url||img1.src);
+      u2 = editorImages[2] ? await uploadImageToStorage(editorImages[2]) : (eg?.image2_url||img2.src);
+    } else {
+      u1 = editorImages[1] ? await uploadImageToStorage(editorImages[1]) : img1.src;
+      u2 = editorImages[2] ? await uploadImageToStorage(editorImages[2]) : img2.src;
+    }
+    const gd = {title,image1_url:u1,image2_url:u2,differences:editorCircles};
+    if (currentGameId) { await updateGameRecord(currentGameId, gd); showToast('✅ 遊戲已更新！'); }
+    else { await insertGame(gd); showToast('🎉 遊戲已建立！'); }
+    await loadGames(); navigateTo('teacher');
+  } catch(e) { console.error('儲存失敗:', e); showToast('❌ 儲存失敗：' + e.message); }
+}
+
+// ============================================================
+// SECTION 13: PLAY MODE
+// ============================================================
+function startPlay(gameId) {
+  const game = games.find(g=>g.id===gameId);
+  if (!game) { showToast('❌ 找不到遊戲'); return; }
+  playFoundIndices=new Set(); playTotalDifferences=(Array.isArray(game.differences)?game.differences.length:0);
+  document.getElementById('playTitle').textContent='🔍 '+game.title;
+  document.getElementById('foundCount').textContent='0'; document.getElementById('totalCount').textContent=playTotalDifferences;
+  document.getElementById('playImages').innerHTML =
+    '<div class="play-image-container" id="playImageContainer1"><span class="play-label">圖片 A</span><img id="playImage1" src="'+escapeHtml(game.image1_url)+'" alt="圖片 1" draggable="false"></div>'+
+    '<div class="play-image-container" id="playImageContainer2"><span class="play-label">圖片 B</span><img id="playImage2" src="'+escapeHtml(game.image2_url)+'" alt="圖片 2" draggable="false"></div>';
+  document.getElementById('playImageContainer1').dataset.gameId=gameId;
+  document.getElementById('playImageContainer2').dataset.gameId=gameId;
+  navigateTo('play'); setTimeout(()=>setupPlayClickHandlers(game),300);
+}
+
+function setupPlayClickHandlers(game) {
+  const c1=document.getElementById('playImageContainer1'), c2=document.getElementById('playImageContainer2');
+  if(!c1||!c2) return;
+  const diffs=Array.isArray(game.differences)?game.differences:[];
+  function handle(container,imgId,e){
+    const img=document.getElementById(imgId);
+    if(!img||!img.naturalWidth) return;
+    const r=img.getBoundingClientRect();
+    const fx=(e.clientX-r.left)/r.width, fy=(e.clientY-r.top)/r.height;
+    let found=false;
+    for(let i=0;i<diffs.length;i++){
+      if(playFoundIndices.has(i)) continue;
+      const d=diffs[i];
+      const dx=(fx-d.x)/(d.rx||0.04), dy=(fy-d.y)/(d.ry||0.04);
+      if(Math.sqrt(dx*dx+dy*dy)<=1.8){
+        found=true; playFoundIndices.add(i);
+        showFoundCircle(container,d,i); playDingDong(); updatePlayScore();
+        spawnSparkles(container,e.clientX-container.getBoundingClientRect().left,e.clientY-container.getBoundingClientRect().top);
+        break;
+      }
+    }
+    if(!found) showClickRipple(container,e.clientX-container.getBoundingClientRect().left,e.clientY-container.getBoundingClientRect().top);
+    if(playFoundIndices.size>=playTotalDifferences) setTimeout(()=>celebrateCompletion(),600);
+  }
+  c1.addEventListener('click',e=>handle(c1,'playImage1',e));
+  c2.addEventListener('click',e=>handle(c2,'playImage2',e));
+  c1.addEventListener('touchstart',e=>{if(e.touches.length===1){const t=e.touches[0];handle(c1,'playImage1',{clientX:t.clientX,clientY:t.clientY});}});
+  c2.addEventListener('touchstart',e=>{if(e.touches.length===1){const t=e.touches[0];handle(c2,'playImage2',{clientX:t.clientX,clientY:t.clientY});}});
+}
+
+function showFoundCircle(container,diff,index){
+  const img=container.querySelector('img'); if(!img) return;
+  const ri=img.getBoundingClientRect(), rc=container.getBoundingClientRect();
+  const ox=ri.left-rc.left, oy=ri.top-rc.top;
+  const cx=ox+diff.x*ri.width, cy=oy+diff.y*ri.height, rx=diff.rx*ri.width, ry=diff.ry*ri.height;
+  const d=document.createElement('div'); d.className='play-circle';
+  d.style.cssText='left:'+(cx-rx)+'px;top:'+(cy-ry)+'px;width:'+(rx*2)+'px;height:'+(ry*2)+'px;';
+  container.appendChild(d);
+}
+function renderPlayCircles(){
+  document.querySelectorAll('.play-image-container').forEach(ct=>{
+    ct.querySelectorAll('.play-circle').forEach(c=>c.remove());
+    const gid=ct.dataset.gameId; if(!gid) return; const game=games.find(g=>g.id===gid); if(!game) return;
+    const diffs=Array.isArray(game.differences)?game.differences:[];
+    playFoundIndices.forEach(i=>{if(i<diffs.length) showFoundCircle(ct,diffs[i],i);});
+  });
+}
+function showClickRipple(container,x,y){
+  const d=document.createElement('div'); d.className='click-ripple'; d.style.left=x+'px'; d.style.top=y+'px';
+  container.appendChild(d); setTimeout(()=>d.remove(),500);
+}
+function spawnSparkles(container,x,y){
+  const em=['⭐','✨','💫','🌟','💖'];
+  for(let i=0;i<5;i++){const s=document.createElement('div');s.className='sparkle';s.textContent=em[Math.floor(Math.random()*5)];s.style.left=(x+(Math.random()-0.5)*40)+'px';s.style.top=(y+(Math.random()-0.5)*40)+'px';s.style.fontSize=(1.2+Math.random()*1.5)+'rem';s.style.animationDuration=(0.4+Math.random()*0.5)+'s';container.appendChild(s);setTimeout(()=>s.remove(),1000);}
+}
+function updatePlayScore(){document.getElementById('foundCount').textContent=playFoundIndices.size;}
+
+// ============================================================
+// SECTION 14: AUDIO — DING DONG
+// ============================================================
+function playDingDong(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)(),now=ctx.currentTime;
+    const o1=ctx.createOscillator(),g1=ctx.createGain();o1.type='sine';o1.frequency.setValueAtTime(880,now);g1.gain.setValueAtTime(0,now);g1.gain.linearRampToValueAtTime(0.35,now+0.04);g1.gain.exponentialRampToValueAtTime(0.001,now+0.35);o1.connect(g1);g1.connect(ctx.destination);o1.start(now);o1.stop(now+0.35);
+    const o2=ctx.createOscillator(),g2=ctx.createGain();o2.type='sine';o2.frequency.setValueAtTime(660,now+0.12);g2.gain.setValueAtTime(0,now+0.12);g2.gain.linearRampToValueAtTime(0.35,now+0.16);g2.gain.exponentialRampToValueAtTime(0.001,now+0.6);o2.connect(g2);g2.connect(ctx.destination);o2.start(now+0.12);o2.stop(now+0.6);
+  }catch(e){}
+}
+
+// ============================================================
+// SECTION 15: CELEBRATION
+// ============================================================
+function celebrateCompletion(){
+  playDingDong();setTimeout(()=>playDingDong(),400);
+  const ov=document.getElementById('celebrationOverlay'),em=['🎉','🎊','⭐','💖','🌈','🏆','👏','🎈','🦄','💫','✨','🌟'];
+  for(let i=0;i<40;i++){const d=document.createElement('div');d.className='celebration-emoji';d.textContent=em[Math.floor(Math.random()*12)];d.style.left=Math.random()*100+'%';d.style.top=-(Math.random()*20)+'%';d.style.animationDelay=Math.random()*1.5+'s';d.style.animationDuration=(1.5+Math.random()*2.5)+'s';d.style.fontSize=(2+Math.random()*3)+'rem';ov.appendChild(d);}
+  setTimeout(()=>{ov.innerHTML='';showToast('🎉 太棒了！全部找到了！你真是找不同高手！🏆');},4000);
+}
+
+// ============================================================
+// SECTION 16: UTILITIES
+// ============================================================
+function escapeHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+// ============================================================
+// BOOT
+// ============================================================
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
