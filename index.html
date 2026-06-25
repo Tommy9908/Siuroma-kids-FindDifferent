@@ -341,8 +341,13 @@ h3 { font-size: 1.3rem; font-weight: 700; }
   background: var(--coral); color: #fff;
   border-radius: 50px; font-size: 0.95rem; font-weight: 700;
   animation: hintPulse 1.2s ease-in-out infinite;
-  grid-column: 2;         /* 固定在右欄（圖片B正下方） */
+  grid-column: 1;         /* 直屏：圖片下方 */
   justify-self: center;
+}
+@media (min-width: 769px) {
+  .play-hint {
+    grid-column: 2;       /* 橫屏：圖片B正下方 */
+  }
 }
 @media (max-width: 768px) {
   .play-hint { font-size: 0.9rem; }
