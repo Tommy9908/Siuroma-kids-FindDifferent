@@ -341,15 +341,11 @@ h3 { font-size: 1.3rem; font-weight: 700; }
   background: var(--coral); color: #fff;
   border-radius: 50px; font-size: 0.95rem; font-weight: 700;
   animation: hintPulse 1.2s ease-in-out infinite;
-  width: fit-content; max-width: 100%;
-  justify-self: start;
-  align-self: center;
+  grid-column: 1 / -1;   /* 橫跨兩欄，放在圖片A和B的下方 */
+  justify-self: center;
 }
 @media (max-width: 768px) {
-  .play-hint {
-    justify-self: center;
-    font-size: 0.9rem;
-  }
+  .play-hint { font-size: 0.9rem; }
 }
 @keyframes hintPulse {
   0%,100% { transform: scale(1); }
