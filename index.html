@@ -335,18 +335,18 @@ h3 { font-size: 1.3rem; font-weight: 700; }
   0%,100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.4); }
   50% { box-shadow: 0 0 0 12px rgba(255,107,107,0); }
 }
-.play-image-container.play-target::after {
-  content: '👆 點這裡！';
-  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+/* 提示文字（圖片外） */
+.play-hint {
+  text-align: center; padding: 12px 20px; margin-bottom: 8px;
   background: var(--coral); color: #fff;
-  padding: 6px 16px; border-radius: 20px;
-  font-size: 1rem; font-weight: 700; pointer-events: none;
-  z-index: 10; animation: bounceHint 0.8s ease-in-out infinite;
-  white-space: nowrap;
+  border-radius: 50px; font-size: 1.05rem; font-weight: 700;
+  animation: hintPulse 1.2s ease-in-out infinite;
+  width: fit-content;
+  margin-left: auto; margin-right: auto;
 }
-@keyframes bounceHint {
-  0%,100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-6px); }
+@keyframes hintPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
 }
 
 /* 放大按鈕 */
@@ -599,6 +599,7 @@ h3 { font-size: 1.3rem; font-weight: 700; }
         <span class="total-count" id="totalCount">0</span>
       </div>
     </div>
+    <div class="play-hint" id="playHint"></div>
     <div class="play-images" id="playImages"></div>
   </div>
 </div>
@@ -1103,12 +1104,13 @@ function startPlay(gameId) {
 function markTargetImage() {
   const c1=document.getElementById('playImageContainer1');
   const c2=document.getElementById('playImageContainer2');
+  const hint=document.getElementById('playHint');
   if(!c1||!c2) return;
   c1.classList.remove('play-target');
   c2.classList.remove('play-target');
-  const orient = getPlayOrientation();
-  // 橫屏：左邊(第一張)；直屏：上面(第一張)，都是第一張
   c1.classList.add('play-target');
+  // 提示文字放在圖片外
+  if(hint) hint.textContent = '👆 點擊這張圖片來圈住不一樣的地方';
 }
 
 // 全屏放大功能
