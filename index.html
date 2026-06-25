@@ -341,7 +341,7 @@ h3 { font-size: 1.3rem; font-weight: 700; }
   background: var(--coral); color: #fff;
   border-radius: 50px; font-size: 0.95rem; font-weight: 700;
   animation: hintPulse 1.2s ease-in-out infinite;
-  grid-column: 1 / -1;   /* 橫跨兩欄，放在圖片A和B的下方 */
+  grid-column: 1;         /* 固定在左欄（圖片A正下方） */
   justify-self: center;
 }
 @media (max-width: 768px) {
@@ -1086,11 +1086,11 @@ function startPlay(gameId) {
       '<button class="zoom-btn" id="zoomBtn1" title="放大圖片">🔍</button>'+
       '<img id="playImage1" src="'+escapeHtml(game.image1_url)+'" alt="圖片 1" draggable="false">'+
     '</div>'+
-    '<div class="play-hint" id="playHint"></div>'+
     '<div class="play-image-container" id="playImageContainer2">'+
       '<button class="zoom-btn" id="zoomBtn2" title="放大圖片">🔍</button>'+
       '<img id="playImage2" src="'+escapeHtml(game.image2_url)+'" alt="圖片 2" draggable="false">'+
-    '</div>';
+    '</div>'+
+    '<div class="play-hint" id="playHint"></div>';
 
   document.getElementById('playImageContainer1').dataset.gameId=gameId;
   document.getElementById('playImageContainer2').dataset.gameId=gameId;
