@@ -341,7 +341,7 @@ h3 { font-size: 1.3rem; font-weight: 700; }
   background: var(--coral); color: #fff;
   border-radius: 50px; font-size: 0.95rem; font-weight: 700;
   animation: hintPulse 1.2s ease-in-out infinite;
-  grid-column: 1;         /* 固定在左欄（圖片A正下方） */
+  grid-column: 2;         /* 固定在右欄（圖片B正下方） */
   justify-self: center;
 }
 @media (max-width: 768px) {
@@ -1111,8 +1111,7 @@ function markTargetImage() {
   if(!c1||!c2) return;
   c1.classList.remove('play-target');
   c2.classList.remove('play-target');
-  c1.classList.add('play-target');
-  // 提示文字放在圖片外
+  c2.classList.add('play-target');
   if(hint) hint.textContent = '👆 點擊這張圖片來圈住不一樣的地方';
 }
 
@@ -1165,9 +1164,9 @@ function setupPlayClickHandlers(game) {
     if(playFoundIndices.size>=playTotalDifferences) setTimeout(()=>celebrateCompletion(),600);
   }
 
-  // 只有圖片A可以點擊，圖片B無效
-  c1.addEventListener('click',e=>handle(c1,'playImage1',e));
-  c1.addEventListener('touchstart',e=>{if(e.touches.length===1){const t=e.touches[0];handle(c1,'playImage1',{clientX:t.clientX,clientY:t.clientY});}});
+  // 只有圖片B可以點擊
+  c2.addEventListener('click',e=>handle(c2,'playImage2',e));
+  c2.addEventListener('touchstart',e=>{if(e.touches.length===1){const t=e.touches[0];handle(c2,'playImage2',{clientX:t.clientX,clientY:t.clientY});}});
 }
 
 function showFoundCircle(container,diff,index){
