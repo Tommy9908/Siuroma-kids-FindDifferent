@@ -1165,10 +1165,9 @@ function setupPlayClickHandlers(game) {
     if(playFoundIndices.size>=playTotalDifferences) setTimeout(()=>celebrateCompletion(),600);
   }
 
+  // 只有圖片A可以點擊，圖片B無效
   c1.addEventListener('click',e=>handle(c1,'playImage1',e));
-  c2.addEventListener('click',e=>handle(c2,'playImage2',e));
   c1.addEventListener('touchstart',e=>{if(e.touches.length===1){const t=e.touches[0];handle(c1,'playImage1',{clientX:t.clientX,clientY:t.clientY});}});
-  c2.addEventListener('touchstart',e=>{if(e.touches.length===1){const t=e.touches[0];handle(c2,'playImage2',{clientX:t.clientX,clientY:t.clientY});}});
 }
 
 function showFoundCircle(container,diff,index){
